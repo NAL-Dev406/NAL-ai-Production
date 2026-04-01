@@ -41,34 +41,45 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # --- 🗄️ 4. 新增：自动归档核心逻辑 ---
-def save_to_nal_archive(archive_type, title, content, score=0):
-    """强制反馈版：确保我们能看到数据是否发出了"""
-    if st.session_state.get('user'):
-        try:
-            # 构造数据
-            payload = {
-                "user_id": st.session_state['user'].id,
-                "archive_type": archive_type,
-                "work_title": title,
-                "content": content,
-                "score": score
-            }
-            
-            # 🌟 调试：在侧边栏显示我们要发送的东西
-            st.sidebar.write("正在尝试发送数据...", payload)
-            
-            # 执行插入
-            res = supabase.table("nal_archives").insert(payload).execute()
-            
-            # 🌟 成功反馈
-            st.sidebar.success(f"✅ 档案已同步至云端: {title}")
-            st.toast(f"档案已存入我的档案室")
-        except Exception as e:
-            # 🌟 报错反馈：如果数据库拒绝，这里一定会显示原因
-            st.sidebar.error(f"💾 归档核心故障: {e}")
-    else:
-        # 如果没登录，这里会提示
-        st.sidebar.warning("⚠️ 归档跳过：检测到未登录状态")
+    def save_to_nal_archive(archive_type, title, content, score=0):
+        """强制反馈版：确保我们能看到数据是否发出了"""
+        if st.session_state.get('user'):
+           with st.spinner("💾 正在加锁同步至 NAL 档案室..."): # 增加物理阻断
+            try:
+                # 显式执行并等待结果返回
+                data = {
+                    "user_id": st.session_state['user'].id,
+                    "archive_type": archive_type,
+                    "work_title": title,
+                    "content": content,
+                    "score": score
+                }
+                res = supabase.table("nal_archives").insert(data).execute()
+                # 只有确认返回了数据，才算成功
+                if res.data:
+                    st.sidebar.success(f"✅ 存档成功: {title}")
+                    time.sleep(0.5) # 强制停顿半秒，确保数据库 I/O 完成
+                return True
+            except Exception as e:
+                st.error(f"🚨 归档写入崩溃: {e}")
+                return False
+    return False
+                
+                # 🌟 调试：在侧边栏显示我们要发送的东西
+                st.sidebar.write("正在尝试发送数据...", payload)
+                
+                # 执行插入
+                res = supabase.table("nal_archives").insert(payload).execute()
+                
+                # 🌟 成功反馈
+                st.sidebar.success(f"✅ 档案已同步至云端: {title}")
+                st.toast(f"档案已存入我的档案室")
+            except Exception as e:
+                # 🌟 报错反馈：如果数据库拒绝，这里一定会显示原因
+                st.sidebar.error(f"💾 归档核心故障: {e}")
+        else:
+            # 如果没登录，这里会提示
+            st.sidebar.warning("⚠️ 归档跳过：检测到未登录状态")
 
 MODEL_CREATIVE = "gemini-2.5-flash"
 MODEL_EVAL = "gemini-3.1-pro-preview"
@@ -169,6 +180,9 @@ with tab1:
                 
                 if res.text:
                     st.session_state['c_guide'] = res.text
+                    # 先同步，同步成功后再执行后续逻辑
+                    if save_to_nal_archive("creative", c_filename, res.text):
+                        st.rerun()
                     st.session_state["last_creative_prompt"] = u_prompt
                     # 🌟 调试改动：使用阻塞式归档
                     with st.status("🚀 正在同步至 NAL 云端档案室...", expanded=True) as status:
