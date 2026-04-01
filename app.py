@@ -42,32 +42,59 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # --- 🗄️ 4. 新增：自动归档核心逻辑 ---
 def save_to_nal_archive(archive_type, title, content, score=0):
-    """阻塞式归档：确保数据入库，否则报错停止"""
+    """
+    NAL 档案室核心归档函数 (V16.9 深度调试版)
+    解决 42501 权限错误与 st.rerun() 冲突问题
+    """
+    # 1. 权限预检：必须在 SaaS 模式登录下才能归档
     if st.session_state.get('user'):
-        # 使用 spinner 阻止用户操作，直到数据库返回结果
-        with st.spinner(f"📡 正在同步【{title}】至 NAL 云端档案库..."):
+        current_uid = st.session_state['user'].id
+        
+        # 在侧边栏实时打印当前尝试写入的 UID，用于手动核对 Supabase auth.users 表
+        st.sidebar.info(f"正在尝试同步 UID: {current_uid[:8]}...") 
+
+        with st.spinner(f"📡 正在将《{title}》存入云端档案库..."):
             try:
-                data = {
-                    "user_id": st.session_state['user'].id,
+                # 2. 构造数据负载
+                payload = {
+                    "user_id": current_uid,
                     "archive_type": archive_type,
                     "work_title": title,
                     "content": content,
                     "score": score
                 }
-                # 执行并等待结果
-                res = supabase.table("nal_archives").insert(data).execute()
                 
-                # 检查是否真的写入成功
-                if res.data:
-                    st.toast("✅ 存档已确认")
-                    time.sleep(0.8) # 强制留出物理传输时间，防止 rerun 截断
+                # 3. 执行插入并等待响应
+                # 注意：这里不使用 .execute() 后的异步处理，确保同步阻塞
+                response = supabase.table("nal_archives").insert(payload).execute()
+                
+                # 4. 结果判定
+                if response.data:
+                    st.toast(f"✅ 归档成功：{title}")
+                    # 关键：物理停顿 0.8 秒，确保数据库 I/O 彻底完成再允许外部调用 st.rerun()
+                    time.sleep(0.8) 
                     return True
+                else:
+                    st.sidebar.error("⚠️ 数据库响应为空，请检查表结构。")
+                    return False
+
             except Exception as e:
-                # 这里的报错将不再闪现，而是停留在屏幕上供您检查
-                st.error(f"🚨 数据库拒绝写入！详情: {e}")
-                st.info("💡 请检查：1. Supabase 字段名是否一致；2. RLS 策略是否允许插入；3. 环境变量是否带有引号。")
-                st.stop() # 强制停止，报错不消失
-    return False
+                # 5. 错误捕获：将 42501 等错误强制停留在屏幕上
+                st.error(f"🚨 NAL 档案系统写入崩溃！")
+                st.code(f"错误详情: {e}") # 使用 code 块方便您复制报错内容
+                
+                st.info("""
+                💡 **排查指南：**
+                1. **RLS 策略**：确保已在 Supabase 运行了 `FOR ALL TO authenticated` 的 Debug SQL。
+                2. **环境变量**：检查 Render 中的 `SUPABASE_KEY` 是否带了引号或空格。
+                3. **字段类型**：确认数据库中 `user_id` 列的类型是 `uuid` 而非 `text`。
+                """)
+                
+                # 强制停止脚本执行，防止被 st.rerun() 刷掉错误信息
+                st.stop() 
+    else:
+        st.sidebar.warning("⚠️ 未检测到登录状态，本次生成未归档。")
+        return False
 
 MODEL_CREATIVE = "gemini-2.5-flash"
 MODEL_EVAL = "gemini-3.1-pro-preview"
