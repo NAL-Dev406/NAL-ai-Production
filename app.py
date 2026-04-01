@@ -185,8 +185,7 @@ with tab1:
                     st.session_state["last_creative_prompt"] = u_prompt
                      # 2.调用归档函数，并根据结果决定是否刷新
                     try:
-                       if save_to_nal_archive("creative", c_filename, res.text):
-                           st.rerun()
+                       save_to_nal_archive("creative", c_filename, res.text)
                     except Exception as e:
                         st.error(f"🚨 归档发生异常: {e}")
                    # --- 归档逻辑结束 ---    
