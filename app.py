@@ -182,11 +182,14 @@ with tab1:
                 if res.text:
                     # 1. 更新内存状态
                     st.session_state['c_guide'] = res.text
-                    # 2. 调用归档函数
-                    # 注意：只有当函数返回 True（确认入库）时，才执行 st.rerun()
-                if save_to_nal_archive("creative", c_filename, res.text):
-                    st.rerun()
-    except Exception as e: st.error(f"异常: {e}")
+                    st.session_state["last_creative_prompt"] = u_prompt
+                    try:
+                        # 2.调用归档函数，并根据结果决定是否刷新
+                        if save_to_nal_archive("creative", c_filename, res.text):
+                            st.rerun()
+                    except Exception as e: 
+                        st.error(f"🚨 归档发生异常: {e}")
+                        st.stop() # 报错时停止，方便查看错误
 
     if st.session_state.get('c_guide'):
         st.markdown("---")
