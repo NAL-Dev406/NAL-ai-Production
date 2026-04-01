@@ -172,16 +172,16 @@ with tab1:
                     st.session_state["last_creative_prompt"] = u_prompt
                     # 🌟 调试改动：使用阻塞式归档
                     with st.status("🚀 正在同步至 NAL 云端档案室...", expanded=True) as status:
-                    try:
-                        # 调用归档函数
-                        save_to_nal_archive("creative", c_filename, res.text)
-                        status.update(label="✅ 归档已完成！", state="complete", expanded=False)
-                        time.sleep(1) # 给数据库 1 秒缓冲时间
-                        st.rerun() 
-                    except Exception as e:
-                        status.update(label="❌ 归档发生错误", state="error")
-                        st.error(f"具体错误信息: {e}")
-                        st.stop() # 强制停止，防止错误信息消失
+                        try:
+                            # 调用归档函数
+                            save_to_nal_archive("creative", c_filename, res.text)
+                            status.update(label="✅ 归档已完成！", state="complete", expanded=False)
+                            time.sleep(1) # 给数据库 1 秒缓冲时间
+                            st.rerun() 
+                        except Exception as e:
+                            status.update(label="❌ 归档发生错误", state="error")
+                            st.error(f"具体错误信息: {e}")
+                            st.stop() # 强制停止，防止错误信息消失
                    # save_to_nal_archive("creative", c_filename, res.text)
                     st.rerun() 
             except Exception as e: st.error(f"引擎异常: {e}")
