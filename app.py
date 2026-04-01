@@ -116,7 +116,14 @@ else:
         st.title("🔒 NAL 内部测试系统")
         inv = st.text_input("评委/作者邀请码：", type="password")
         if st.button("确认进入"): 
-            VALID_CODES = ["NAL2026", "EDITOR_ZXW", "EDITOR_CBT", "EDITOR_GFR"]
+            # ✅ 改进：从环境变量读取邀请码，如果没有设置则使用默认值
+            env_codes = os.getenv("NAL_INVITE_CODES")
+            if env_codes:
+                VALID_CODES = [code.strip() for code in env_codes.split(",")]
+            else:
+                # 默认备份方案
+                VALID_CODES = ["NAL2026"] 
+                
             if inv in VALID_CODES: 
                 st.session_state["access_granted"] = True
                 st.rerun()
