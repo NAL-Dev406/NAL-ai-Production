@@ -47,25 +47,33 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # --- 🗄️ 新增：数据归档核心逻辑函数 ---
 def save_to_nal_archive(archive_type, title, content, score=0):
-    if st.session_state.get('user'):
-        try:
-            data = {
-                "user_id": st.session_state['user'].id,
-                "archive_type": archive_type,
-                "work_title": title,
-                "content": content,
-                "score": score
-            }
-            # 加上这行打印，看看数据准备得对不对
-            # st.write(f"调试：准备归档数据 - {data}") 
-            
-            res = supabase.table("nal_archives").insert(data).execute()
-            
-            # 如果运行到这里，说明数据库接受了请求
-            st.toast(f"✅ {archive_type} 档案已同步") 
-        except Exception as e:
-            # 强制在主界面显示错误，不要放在侧边栏
-            st.error(f"❌ 归档核心故障: {e}")
+    """调试版归档函数"""
+    # 1. 检查用户是否登录
+    if not st.session_state.get('user'):
+        st.sidebar.warning("⚠️ 归档跳过：用户未登录")
+        return
+
+    try:
+        # 2. 构造数据
+        data = {
+            "user_id": st.session_state['user'].id,
+            "archive_type": archive_type,
+            "work_title": title,
+            "content": content,
+            "score": score
+        }
+        
+        # 3. 执行插入并强制获取结果
+        res = supabase.table("nal_archives").insert(data).execute()
+        
+        # 4. 成功反馈
+        st.toast(f"✅ 档案同步成功: {title}")
+        
+    except Exception as e:
+        # 5. 核心报错：如果数据库拒绝，这里会显示具体原因（如 RLS 拒绝、字段名错等）
+        st.error(f"❌ 归档失败详细报告: {e}")
+        # 打印出当前尝试使用的 URL，检查是否为空（调试用）
+        st.write(f"调试信息 - Supabase URL 是否存在: {bool(os.getenv('SUPABASE_URL'))}")
 
 MODEL_CREATIVE = "gemini-2.5-flash"
 MODEL_EVAL = "gemini-3.1-pro-preview"
