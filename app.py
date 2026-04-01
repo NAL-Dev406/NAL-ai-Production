@@ -170,14 +170,18 @@ with tab1:
                 if res.text:
                     st.session_state['c_guide'] = res.text
                     st.session_state["last_creative_prompt"] = u_prompt
-                    # 🌟 调试改动：增加报错拦截
+                    # 🌟 调试改动：使用阻塞式归档
+                    with st.status("🚀 正在同步至 NAL 云端档案室...", expanded=True) as status:
                     try:
+                        # 调用归档函数
                         save_to_nal_archive("creative", c_filename, res.text)
-                        st.rerun() # 只有成功了才刷新
+                        status.update(label="✅ 归档已完成！", state="complete", expanded=False)
+                        time.sleep(1) # 给数据库 1 秒缓冲时间
+                        st.rerun() 
                     except Exception as e:
-                        # 如果归档函数抛出异常，这里会拦截并显示，且不会触发 rerun
-                        st.error(f"🚨 捕获到归档崩溃: {e}")
-                        st.stop() # 强制停止脚本，让您可以慢慢看错误信息
+                        status.update(label="❌ 归档发生错误", state="error")
+                        st.error(f"具体错误信息: {e}")
+                        st.stop() # 强制停止，防止错误信息消失
                    # save_to_nal_archive("creative", c_filename, res.text)
                     st.rerun() 
             except Exception as e: st.error(f"引擎异常: {e}")
