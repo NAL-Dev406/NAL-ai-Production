@@ -1,0 +1,3 @@
+{
+  "rewriteConfig": { "source": "/(.*)", "destination": "/api/index" }
+}
