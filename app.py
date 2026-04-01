@@ -42,22 +42,33 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # --- 🗄️ 4. 新增：自动归档核心逻辑 ---
 def save_to_nal_archive(archive_type, title, content, score=0):
-    """临时调试版：如果报错，会在侧边栏显示红色提示"""
+    """强制反馈版：确保我们能看到数据是否发出了"""
     if st.session_state.get('user'):
         try:
-            # 执行插入
-            supabase.table("nal_archives").insert({
+            # 构造数据
+            payload = {
                 "user_id": st.session_state['user'].id,
                 "archive_type": archive_type,
                 "work_title": title,
                 "content": content,
                 "score": score
-            }).execute()
-            # 如果成功，弹出一个短暂的提示
-            st.toast(f"✅ 档案已同步: {title}")
+            }
+            
+            # 🌟 调试：在侧边栏显示我们要发送的东西
+            st.sidebar.write("正在尝试发送数据...", payload)
+            
+            # 执行插入
+            res = supabase.table("nal_archives").insert(payload).execute()
+            
+            # 🌟 成功反馈
+            st.sidebar.success(f"✅ 档案已同步至云端: {title}")
+            st.toast(f"档案已存入我的档案室")
         except Exception as e:
-            # 🌟 核心：如果这里报错，说明数据库拒绝了写入，请告诉我这里的报错内容
+            # 🌟 报错反馈：如果数据库拒绝，这里一定会显示原因
             st.sidebar.error(f"💾 归档核心故障: {e}")
+    else:
+        # 如果没登录，这里会提示
+        st.sidebar.warning("⚠️ 归档跳过：检测到未登录状态")
 
 MODEL_CREATIVE = "gemini-2.5-flash"
 MODEL_EVAL = "gemini-3.1-pro-preview"
