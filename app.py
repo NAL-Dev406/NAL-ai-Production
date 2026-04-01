@@ -33,8 +33,11 @@ if api_key:
 else:
     st.error("❌ 错误：未检测到 GEMINI_API_KEY。请在 Render 的 Environment 页面配置。")
     st.stop()
-except:
-    st.error("❌ 错误：未检测到 API Key。请在 Streamlit 控制台配置。")
+except Exception as e:
+    st.error(f"无法配置 Gemini API: {e}")
+    st.stop()
+#except:
+#    st.error("❌ 错误：未检测到 API Key。请在 Streamlit 控制台配置。")
 
 SUPABASE_URL = "https://hwprweoyqvkwlbqffngh.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh3cHJ3ZW95cXZrd2xicWZmbmdoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MDY5ODQsImV4cCI6MjA5MDQ4Mjk4NH0.zLr6zdJALR8p2xmjtueENFsGUtEpginY_vsYMUgM2us"
