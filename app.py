@@ -49,10 +49,6 @@ def save_to_nal_archive(archive_type, title, content, score=0):
     # 1. 权限预检：必须在 SaaS 模式登录下才能归档
     if st.session_state.get('user'):
         current_uid = st.session_state['user'].id
-        
-        # 在侧边栏实时打印当前尝试写入的 UID，用于手动核对 Supabase auth.users 表
-        st.sidebar.info(f"正在尝试同步 UID: {current_uid[:8]}...") 
-
         with st.spinner(f"📡 正在将《{title}》存入云端档案库..."):
             try:
                 # 2. 构造数据负载
