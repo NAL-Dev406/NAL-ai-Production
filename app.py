@@ -191,7 +191,7 @@ with tab1:
                         st.error(f"🚨 归档发生异常: {e}")
                    # --- 归档逻辑结束 ---    
         except Exception as model_err:
-            st.error(f"❌ 创作引擎异常: {model_err}"
+            st.error(f"❌ 创作引擎异常: {model_err}")
                  
         if st.session_state.get('c_guide'):
            st.markdown("---")
