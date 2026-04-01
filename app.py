@@ -43,8 +43,8 @@ except Exception as e:
 #except:
 #    st.error("❌ 错误：未检测到 API Key。请在 Streamlit 控制台配置。")
 
-SUPABASE_URL = "https://hwprweoyqvkwlbqffngh.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh3cHJ3ZW95cXZrd2xicWZmbmdoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MDY5ODQsImV4cCI6MjA5MDQ4Mjk4NH0.zLr6zdJALR8p2xmjtueENFsGUtEpginY_vsYMUgM2us"
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 MODEL_CREATIVE = "gemini-2.5-flash"
