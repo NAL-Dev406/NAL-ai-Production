@@ -189,7 +189,8 @@ with tab1:
                             st.rerun()
                     except Exception as e: 
                         st.error(f"🚨 归档发生异常: {e}")
-                       
+                   # --- 归档逻辑结束 ---    
+        
         if st.session_state.get('c_guide'):
            st.markdown("---")
            st.write(st.session_state['c_guide'])
