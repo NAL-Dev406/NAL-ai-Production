@@ -47,7 +47,6 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # --- 🗄️ 新增：数据归档核心逻辑函数 ---
 def save_to_nal_archive(archive_type, title, content, score=0):
-    """将生成内容自动保存到 Supabase，仅在用户登录时生效"""
     if st.session_state.get('user'):
         try:
             data = {
@@ -57,10 +56,16 @@ def save_to_nal_archive(archive_type, title, content, score=0):
                 "content": content,
                 "score": score
             }
-            supabase.table("nal_archives").insert(data).execute()
+            # 加上这行打印，看看数据准备得对不对
+            # st.write(f"调试：准备归档数据 - {data}") 
+            
+            res = supabase.table("nal_archives").insert(data).execute()
+            
+            # 如果运行到这里，说明数据库接受了请求
+            st.toast(f"✅ {archive_type} 档案已同步") 
         except Exception as e:
-            # 在侧边栏静默提示，不干扰主界面布局
-            st.sidebar.error(f"💾 自动归档失败: {e}")
+            # 强制在主界面显示错误，不要放在侧边栏
+            st.error(f"❌ 归档核心故障: {e}")
 
 MODEL_CREATIVE = "gemini-2.5-flash"
 MODEL_EVAL = "gemini-3.1-pro-preview"
