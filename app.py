@@ -65,7 +65,7 @@ def save_to_nal_archive(archive_type, title, content, score=0):
     return False
                 
                 # 🌟 调试：在侧边栏显示我们要发送的东西
-                st.sidebar.write("正在尝试发送数据...", payload)
+            st.sidebar.write("正在尝试发送数据...", payload)
                 
                 # 执行插入
                 res = supabase.table("nal_archives").insert(payload).execute()
