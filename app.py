@@ -187,8 +187,8 @@ with tab1:
                         # 2.调用归档函数，并根据结果决定是否刷新
                         if save_to_nal_archive("creative", c_filename, res.text):
                             st.rerun()
-                    except Exception as e:
-                        st.error(f"🚨 归档发生异常: {e}")
+            except Exception as e:
+                st.error(f"🚨 归档发生异常: {e}")
                    # --- 归档逻辑结束 ---    
         
         if st.session_state.get('c_guide'):
