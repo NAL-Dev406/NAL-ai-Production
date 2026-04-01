@@ -42,18 +42,22 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # --- 🗄️ 4. 新增：自动归档核心逻辑 ---
 def save_to_nal_archive(archive_type, title, content, score=0):
+    """临时调试版：如果报错，会在侧边栏显示红色提示"""
     if st.session_state.get('user'):
         try:
-            res = supabase.table("nal_archives").insert({
+            # 执行插入
+            supabase.table("nal_archives").insert({
                 "user_id": st.session_state['user'].id,
                 "archive_type": archive_type,
                 "work_title": title,
                 "content": content,
                 "score": score
             }).execute()
-            st.sidebar.success(f"💾 存档成功: {title}") # 临时增加
+            # 如果成功，弹出一个短暂的提示
+            st.toast(f"✅ 档案已同步: {title}")
         except Exception as e:
-            st.sidebar.error(f"❌ 存档失败: {e}") # 捕捉具体报错
+            # 🌟 核心：如果这里报错，说明数据库拒绝了写入，请告诉我这里的报错内容
+            st.sidebar.error(f"💾 归档核心故障: {e}")
 
 MODEL_CREATIVE = "gemini-2.5-flash"
 MODEL_EVAL = "gemini-3.1-pro-preview"
