@@ -186,7 +186,7 @@ with tab1:
                     # 注意：只有当函数返回 True（确认入库）时，才执行 st.rerun()
                 if save_to_nal_archive("creative", c_filename, res.text):
                     st.rerun()
-     except Exception as e: st.error(f"异常: {e}")
+    except Exception as e: st.error(f"异常: {e}")
 
     if st.session_state.get('c_guide'):
         st.markdown("---")
