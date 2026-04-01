@@ -2,6 +2,7 @@ import streamlit as st
 import google.generativeai as genai
 from docx import Document
 import io
+import os
 import time
 import re
 from supabase import create_client, Client
