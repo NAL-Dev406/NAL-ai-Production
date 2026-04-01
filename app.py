@@ -114,10 +114,10 @@ if is_saas_mode:
     else:
         if not st.session_state['is_vip']:
             st.title("🚀 解锁 NAL 专业版双擎系统")
-            st.markdown(f"欢迎您，**{st.session_state['user'].email}**！您目前使用的是未激活账户。")
+            st.markdown(f"欢迎您，**{st.session_state['user'].email}**！您目前使用的是未激活账户，请订阅以获取 AI 引擎的完整算力支持。")
             c_pay1, c_pay2, c_pay3 = st.columns([1, 2, 1])
             with c_pay2:
-                st.info("💎 **NAL Pro 创作者订阅**\n\n- 开启无限次创作推演\n- 启动极其严苛的 3.1 Pro 评审")
+                st.info("💎 **NAL Pro 创作者订阅**\n\n- 开启无限次创作推演\n- 启动极其严苛的 智能专家 评审")
                 if st.button("🛠️ [开发者通道] 模拟支付成功，一键激活", use_container_width=True):
                     st.session_state['is_vip'] = True
                     st.rerun()
@@ -183,14 +183,16 @@ with tab1:
                     # 1. 更新内存状态
                     st.session_state['c_guide'] = res.text
                     st.session_state["last_creative_prompt"] = u_prompt
+                     # 2.调用归档函数，并根据结果决定是否刷新
                     try:
-                        # 2.调用归档函数，并根据结果决定是否刷新
-                        if save_to_nal_archive("creative", c_filename, res.text):
-                            st.rerun()
-            except Exception as e:
-                st.error(f"🚨 归档发生异常: {e}")
+                       if save_to_nal_archive("creative", c_filename, res.text):
+                           st.rerun()
+                except Exception as e:
+                    st.error(f"🚨 归档发生异常: {e}")
                    # --- 归档逻辑结束 ---    
-        
+    except Exception as model_err：
+        st.error(f"❌ 创作引擎异常: {model_err}"
+                 
         if st.session_state.get('c_guide'):
            st.markdown("---")
            st.write(st.session_state['c_guide'])
