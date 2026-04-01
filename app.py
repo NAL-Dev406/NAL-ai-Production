@@ -183,7 +183,7 @@ with tab1:
                             st.error(f"具体错误信息: {e}")
                             st.stop() # 强制停止，防止错误信息消失
                    # save_to_nal_archive("creative", c_filename, res.text)
-                    st.rerun() 
+                 #   st.rerun() 
             except Exception as e: st.error(f"引擎异常: {e}")
 
     if st.session_state.get('c_guide'):
