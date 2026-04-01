@@ -192,7 +192,7 @@ with tab1:
             except Exception as model_err:
                 st.error(f"❌ 创作引擎异常: {model_err}")
                  
-        if st.session_state.get('c_guide'):
+    if st.session_state.get('c_guide'):
            st.markdown("---")
            st.write(st.session_state['c_guide'])
         
