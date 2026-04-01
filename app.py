@@ -191,9 +191,9 @@ with tab1:
                         st.error(f"🚨 归档发生异常: {e}")
                         st.stop() # 报错时停止，方便查看错误
 
-            if st.session_state.get('c_guide'):
-                st.markdown("---")
-                st.write(st.session_state['c_guide'])
+                if st.session_state.get('c_guide'):
+                    st.markdown("---")
+                    st.write(st.session_state['c_guide'])
         
         # 🌟 逐字还原您的切分逻辑
         guide_text = st.session_state['c_guide']
