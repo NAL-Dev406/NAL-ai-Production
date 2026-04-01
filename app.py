@@ -25,7 +25,7 @@ for key, value in init_keys.items():
         st.session_state[key] = value
 
 try:
-    genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+    genai.configure(api_key=st.secrets["GEMINI_API_KEY"] or or os.getenv("OPENAI_API_KEY"))
 except:
     st.error("❌ 错误：未检测到 API Key。请在 Streamlit 控制台配置。")
 
