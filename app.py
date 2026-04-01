@@ -42,10 +42,11 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # --- 🗄️ 4. 新增：自动归档核心逻辑 ---
 def save_to_nal_archive(archive_type, title, content, score=0):
+    """阻塞式归档：确保数据入库，否则报错停止"""
     if st.session_state.get('user'):
-        with st.spinner("💾 正在加锁同步至 NAL 档案室..."): # 增加物理阻断
+        # 使用 spinner 阻止用户操作，直到数据库返回结果
+        with st.spinner(f"📡 正在同步【{title}】至 NAL 云端档案库..."):
             try:
-                # 显式执行并等待结果返回
                 data = {
                     "user_id": st.session_state['user'].id,
                     "archive_type": archive_type,
@@ -53,32 +54,20 @@ def save_to_nal_archive(archive_type, title, content, score=0):
                     "content": content,
                     "score": score
                 }
+                # 执行并等待结果
                 res = supabase.table("nal_archives").insert(data).execute()
-                # 只有确认返回了数据，才算成功
+                
+                # 检查是否真的写入成功
                 if res.data:
-                    st.sidebar.success(f"✅ 存档成功: {title}")
-                    time.sleep(0.5) # 强制停顿半秒，确保数据库 I/O 完成
-                return True
+                    st.toast("✅ 存档已确认")
+                    time.sleep(0.8) # 强制留出物理传输时间，防止 rerun 截断
+                    return True
             except Exception as e:
-                st.error(f"🚨 归档写入崩溃: {e}")
-                return False
+                # 这里的报错将不再闪现，而是停留在屏幕上供您检查
+                st.error(f"🚨 数据库拒绝写入！详情: {e}")
+                st.info("💡 请检查：1. Supabase 字段名是否一致；2. RLS 策略是否允许插入；3. 环境变量是否带有引号。")
+                st.stop() # 强制停止，报错不消失
     return False
-                
-                # 🌟 调试：在侧边栏显示我们要发送的东西
-                #st.sidebar.write("正在尝试发送数据...", payload)
-                
-                # 执行插入
-                #res = supabase.table("nal_archives").insert(payload).execute()
-                
-                # 🌟 成功反馈
-                #st.sidebar.success(f"✅ 档案已同步至云端: {title}")
-                #st.toast(f"档案已存入我的档案室")
-            #except Exception as e:
-                # 🌟 报错反馈：如果数据库拒绝，这里一定会显示原因
-             #   st.sidebar.error(f"💾 归档核心故障: {e}")
-        #else:
-            # 如果没登录，这里会提示
-         #   st.sidebar.warning("⚠️ 归档跳过：检测到未登录状态")
 
 MODEL_CREATIVE = "gemini-2.5-flash"
 MODEL_EVAL = "gemini-3.1-pro-preview"
@@ -280,9 +269,11 @@ with tab2:
                     match = re.search(r"综合评分[\]】]?\s*[:：]\s*\[?(\d{1,3})\]?", clean_res)
                     if match: score = int(match.group(1))
                     st.session_state['e_score'] = score
-                    
+                    # 🌟 关键：同步成功后再刷新
+                    if save_to_nal_archive("evaluation", up.name, res.text, score):
+                        st.rerun()
                     st.session_state['leaderboard'].append({"作品": up.name, "分数": score, "日期": st.session_state["e_date"]})
-                    save_to_nal_archive("evaluation", up.name, res.text, score)
+                  
                     st.rerun() 
                 except Exception as e: st.error(f"异常: {e}")
 
