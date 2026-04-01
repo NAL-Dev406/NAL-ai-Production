@@ -41,28 +41,28 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # --- 🗄️ 4. 新增：自动归档核心逻辑 ---
- def save_to_nal_archive(archive_type, title, content, score=0):
+def save_to_nal_archive(archive_type, title, content, score=0):
         """强制反馈版：确保我们能看到数据是否发出了"""
-        if st.session_state.get('user'):
-           with st.spinner("💾 正在加锁同步至 NAL 档案室..."): # 增加物理阻断
-            try:
+    if st.session_state.get('user'):
+        with st.spinner("💾 正在加锁同步至 NAL 档案室..."): # 增加物理阻断
+        try:
                 # 显式执行并等待结果返回
-                data = {
-                    "user_id": st.session_state['user'].id,
-                    "archive_type": archive_type,
-                    "work_title": title,
-                    "content": content,
-                    "score": score
-                }
-                res = supabase.table("nal_archives").insert(data).execute()
+            data = {
+                "user_id": st.session_state['user'].id,
+                "archive_type": archive_type,
+                "work_title": title,
+                "content": content,
+                "score": score
+            }
+            res = supabase.table("nal_archives").insert(data).execute()
                 # 只有确认返回了数据，才算成功
-                if res.data:
-                    st.sidebar.success(f"✅ 存档成功: {title}")
-                    time.sleep(0.5) # 强制停顿半秒，确保数据库 I/O 完成
-                return True
-            except Exception as e:
-                st.error(f"🚨 归档写入崩溃: {e}")
-                return False
+            if res.data:
+                st.sidebar.success(f"✅ 存档成功: {title}")
+                time.sleep(0.5) # 强制停顿半秒，确保数据库 I/O 完成
+            return True
+        except Exception as e:
+            st.error(f"🚨 归档写入崩溃: {e}")
+            return False
     return False
                 
                 # 🌟 调试：在侧边栏显示我们要发送的东西
