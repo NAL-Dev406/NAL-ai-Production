@@ -42,7 +42,6 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # --- 🗄️ 4. 新增：自动归档核心逻辑 ---
 def save_to_nal_archive(archive_type, title, content, score=0):
-        """强制反馈版：确保我们能看到数据是否发出了"""
     if st.session_state.get('user'):
         with st.spinner("💾 正在加锁同步至 NAL 档案室..."): # 增加物理阻断
             try:
