@@ -187,8 +187,8 @@ with tab1:
                     try:
                        if save_to_nal_archive("creative", c_filename, res.text):
                            st.rerun()
-                except Exception as e:
-                    st.error(f"🚨 归档发生异常: {e}")
+                    except Exception as e:
+                        st.error(f"🚨 归档发生异常: {e}")
                    # --- 归档逻辑结束 ---    
     except Exception as model_err:
         st.error(f"❌ 创作引擎异常: {model_err}"
