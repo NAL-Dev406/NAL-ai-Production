@@ -65,20 +65,20 @@ def save_to_nal_archive(archive_type, title, content, score=0):
     return False
                 
                 # 🌟 调试：在侧边栏显示我们要发送的东西
-            st.sidebar.write("正在尝试发送数据...", payload)
+                #st.sidebar.write("正在尝试发送数据...", payload)
                 
                 # 执行插入
-                res = supabase.table("nal_archives").insert(payload).execute()
+                #res = supabase.table("nal_archives").insert(payload).execute()
                 
                 # 🌟 成功反馈
-                st.sidebar.success(f"✅ 档案已同步至云端: {title}")
-                st.toast(f"档案已存入我的档案室")
-            except Exception as e:
+                #st.sidebar.success(f"✅ 档案已同步至云端: {title}")
+                #st.toast(f"档案已存入我的档案室")
+            #except Exception as e:
                 # 🌟 报错反馈：如果数据库拒绝，这里一定会显示原因
-                st.sidebar.error(f"💾 归档核心故障: {e}")
-        else:
+             #   st.sidebar.error(f"💾 归档核心故障: {e}")
+        #else:
             # 如果没登录，这里会提示
-            st.sidebar.warning("⚠️ 归档跳过：检测到未登录状态")
+         #   st.sidebar.warning("⚠️ 归档跳过：检测到未登录状态")
 
 MODEL_CREATIVE = "gemini-2.5-flash"
 MODEL_EVAL = "gemini-3.1-pro-preview"
