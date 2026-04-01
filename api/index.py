@@ -1,13 +1,15 @@
 import os
 import sys
-
-# 这里的代码会调用你的 streamlit 应用
 from streamlit.web.cli import main
-if __name__ == "__main__":
+
+# Vercel 要求的处理函数
+def handler(request):
+    # 这里的 main.py 必须是你仓库里那个包含 st.title 的文件名
+    # 如果你的文件名是 app.py，请把下面这行改为 "app.py"
     sys.argv = [
         "streamlit",
         "run",
-        "your_app_name.py",  # 替换成你主程序的脚本名，比如 app.py
+        "main.py", 
         "--server.port", "8080",
         "--server.address", "0.0.0.0"
     ]
