@@ -181,12 +181,11 @@ with tab1:
                 
                 if res.text:
                     # 1. 更新内存状态
-    st.session_state['c_guide'] = res.text
-    
-    # 2. 调用归档函数
-    # 注意：只有当函数返回 True（确认入库）时，才执行 st.rerun()
-    if save_to_nal_archive("creative", c_filename, res.text):
-        st.rerun()
+                    st.session_state['c_guide'] = res.text
+                    # 2. 调用归档函数
+                    # 注意：只有当函数返回 True（确认入库）时，才执行 st.rerun()
+                if save_to_nal_archive("creative", c_filename, res.text):
+                    st.rerun()
            
     if st.session_state.get('c_guide'):
         st.markdown("---")
