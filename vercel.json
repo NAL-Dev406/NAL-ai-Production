@@ -1,3 +1,8 @@
 {
-  "rewriteConfig": { "source": "/(.*)", "destination": "/api/index" }
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/index.py"
+    }
+  ]
 }
