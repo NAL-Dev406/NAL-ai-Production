@@ -25,14 +25,17 @@ for key, value in init_keys.items():
         st.session_state[key] = value
 
 try:
-    #genai.configure(api_key=st.secrets["GEMINI_API_KEY"] or or os.getenv("OPENAI_API_KEY"))
-    api_key = st.secrets.get("GEMINI_API_KEY") or os.getenv("GEMINI_API_KEY")
-
+    # 直接从 Render 的 Environment 页面读取变量
+    api_key = os.getenv("GEMINI_API_KEY")
+    
     if api_key:
-       genai.configure(api_key=api_key)
+        genai.configure(api_key=api_key)
     else:
-        st.error("❌ 错误：未检测到 GEMINI_API_KEY。请在 Render 的 Environment 页面配置。")
+        # 如果环境变量里也没有，再尝试一种备选方案
+        st.error("❌ 错误：未检测到 GEMINI_API_KEY。")
+        st.info("💡 请确保您已在 Render 后台的 Environment 选项卡中添加了该变量。")
         st.stop()
+
 except Exception as e:
     st.error(f"无法配置 Gemini API: {e}")
 
