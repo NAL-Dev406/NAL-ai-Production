@@ -179,7 +179,7 @@ with tab1:
                 model = genai.GenerativeModel(model_name=MODEL_CREATIVE, system_instruction=creative_sys_inst)
                 res = model.generate_content(u_prompt, generation_config=genai.types.GenerationConfig(temperature=0.7))
                 
-                 if res.text:
+                if res.text:
                     # 1. 更新内存状态
                     st.session_state['c_guide'] = res.text
                     st.session_state["last_creative_prompt"] = u_prompt
