@@ -8,10 +8,13 @@ import re
 from supabase import create_client, Client
 
 # --- 顶部标题区 ---
+st.set_page_config(page_title="NAL | 新艺文社数字化平台", layout="wide", page_icon="📚")
+
+# 品牌双行标题 (修正了参数拼写)
 st.markdown("""
     <h1 style='text-align: center; margin-bottom: 0;'>NewArtLiterature Collective (NAL)</h1>
     <h3 style='text-align: center; margin-top: 0; color: #555;'>新艺文社数字化文学平台</h3>
-    """, unsafe_allow_now=True)
+    """, unsafe_allow_html=True) # <-- 这里已经改为 html
 
 st.divider() # 添加一条分割线，让视觉更整洁
 
@@ -19,12 +22,6 @@ st.divider() # 添加一条分割线，让视觉更整洁
 def clean_text(text):
     if not isinstance(text, str): return ""
     return re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f]', '', text)
-
-st.set_page_config(
-    page_title="NAL | 新艺文社数字化平台", # 浏览器标签页显示的文字
-    layout="wide",                      # 保持宽屏布局，方便展示评审报告
-    page_icon="📚"                      # 浏览器标签页的小图标
-)
 
 # --- 🌟 2. Session State 初始化 ---
 init_keys = {
