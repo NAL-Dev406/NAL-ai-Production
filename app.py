@@ -52,6 +52,7 @@ def clean_text(text):
 # --- 🌟 2. Session State 初始化 ---
 init_keys = {
     "user": None, "access_granted": False, "is_vip": False, 
+    "is_open_test": False,  # 👈 新增：标记是否为开放测试用户
     "e_report": None, "e_score": 0, "e_date": "", "e_work_title": "",
     "c_guide": None, "leaderboard": [], "last_eval_time": 0.0,
     "last_creative_prompt": "", "last_eval_text": ""
@@ -301,10 +302,18 @@ else:
         if st.button("确认进入"): 
             env_codes = os.getenv("NAL_INVITE_CODES")
             VALID_CODES = [code.strip() for code in env_codes.split(",")] if env_codes else ["NAL2026"]
-            if inv in VALID_CODES: 
+             # 🚀 新增：开放测试专属通道
+            if inv == "Open_test":
                 st.session_state["access_granted"] = True
+                st.session_state["is_open_test"] = True  # 标记为降级用户
                 st.rerun()
-            else: st.error("邀请码无效。")
+            # 常规内部 VIP 通道
+            elif inv in VALID_CODES: 
+                st.session_state["access_granted"] = True
+                st.session_state["is_open_test"] = False # 享有 3.1 Pro 权限
+                st.rerun()
+            else: 
+                st.error("邀请码无效。")
         st.stop()
 
 # --- 🌟 6. 主功能界面 ---
@@ -317,8 +326,12 @@ if is_saas_mode:
         st.session_state['is_vip'] = False
         st.rerun()
 else:
-    st.sidebar.info("模式：内部邀请评测")
-    st.sidebar.text(f"首席评委：NAL")
+     # 🚀 提示当前权限状态
+    if st.session_state.get("is_open_test"):
+        st.sidebar.warning("模式：开放性测试体验")
+    else:
+        st.sidebar.info("模式：内部邀请评测")
+        st.sidebar.text(f"首席评委：NAL")
 
 st.title("NAL 数字化文学双擎系统")
 tab1, tab2, tab3, tab4 = st.tabs(["💡 创作伴侣", "⚖️ 深度评审", "🏆 评审排行榜", "📁 我的档案室"])
@@ -533,10 +546,15 @@ with tab2:
                         
                         # 🚨 关键修复：将自适应指令与强约束模板合并
                         combined_system_instruction = final_inst + "\n\n" + eval_sys_inst
+
+                        # 🚀 核心降级逻辑：判断用户身份并分配算力
+                        current_engine = MODEL_EVAL
+                        if st.session_state.get("is_open_test"):
+                            current_engine = "gemini-2.5-flash" # 强制降级
                         
                         # 调用大模型 (使用合并后的系统指令)
                         eval_model = genai.GenerativeModel(
-                            model_name=MODEL_EVAL, 
+                            model_name=current_engine, 
                             system_instruction=combined_system_instruction
                         )
                         
