@@ -16,7 +16,7 @@ MODEL_EVAL = "gemini-3.1-pro-preview"
 MODEL_ADAPTIVE = "models/gemini-2.5-flash"
 MODEL_CREATIVE = "gemini-2.5-flash"
 
-st.error("🚀 当前代码版本：测试同步专用")
+st.error("🚀 当前代码版本：开发测试版本，以Open_test身份激活开发测试")
 
 # --- 🌟 2. Session State 初始化 ---
 init_keys = {
