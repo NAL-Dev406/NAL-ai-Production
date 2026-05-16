@@ -306,7 +306,7 @@ if is_saas_mode:
             c_pay1, c_pay2, c_pay3 = st.columns([1, 2, 1])
             with c_pay2:
                 st.info("💎 **NAL Pro 创作者订阅**\n\n- 开启无限次创作推演\n- 启动极其严苛的 智能专家 评审")
-                if st.button("🛠️ [开发者通道] 模拟支付成功，一键激活", use_container_width=True):
+                if st.button("🛠️ [开发者通道] 模拟支付成功，一键激活", width="stretch"):
                     st.session_state['is_vip'] = True
                     st.rerun()
             st.stop()
@@ -337,7 +337,7 @@ with st.sidebar:
     # 0. 核心修复：初始化变量，防止 SaaS 模式下 NameError
     enable_critique = False
     # 1. 品牌与 Logo
-    st.image("nal_logo.jpg", use_container_width=True)
+    st.image("nal_logo.jpg", width="stretch")
     st.markdown("<h3 style='text-align: center;'>NAL 控制台</h3>", unsafe_allow_html=True)
     
     # 2. 身份状态与模式显示 (合并原来的 saas 和内部测试逻辑)
@@ -345,7 +345,7 @@ with st.sidebar:
         if st.session_state.get('user'):
             st.success(f"已登录: {st.session_state['user'].email}")
             enable_critique = st.toggle("🎨 开启专家纠偏模式", value=False, key="saas_critique_toggle")
-            if st.button("🚪 退出登录", use_container_width=True):
+            if st.button("🚪 退出登录", width="stretch"):
                 supabase.auth.sign_out()
                 st.session_state['user'] = None
                 st.session_state['is_vip'] = False
@@ -390,7 +390,7 @@ with st.sidebar:
 
             expert_thought = st.text_area("纠偏意见：", key="side_critique_input", placeholder="输入您的想法...")
             
-            if st.button("🚨 提交样本", use_container_width=True, type="primary"):
+            if st.button("🚨 提交样本", width="stretch", type="primary"):
                 if expert_thought:
                     # 调用定义在顶部的函数
                     save_negative_sample(curr_model, curr_prompt, curr_out, expert_thought)
@@ -755,7 +755,7 @@ with tab2:
             label=f"📥 下载《{safe_r_work}》评审报告", 
             data=rb.getvalue(), 
             file_name=f"NAL_Report_{safe_r_work}.docx", 
-            use_container_width=True
+            width="stretch"
         )
 
 # --- Tab 3: 排行榜 ---
