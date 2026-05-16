@@ -262,7 +262,7 @@ MODEL_OPTIONS = [
 ]
 
 # 极简的数据库抓取（只管转换格式，不管排序）
-# @st.cache_data(ttl=3600)
+@st.cache_data(ttl=3600)
 def fetch_nal_models_from_db():
     res = supabase.table("evaluation_models").select("name, parameters, description").execute()
     # 用一行字典推导式直接搞定数据重组
@@ -271,19 +271,6 @@ def fetch_nal_models_from_db():
     return matrix, descriptions
 
 EVAL_SYSTEM_MATRIX, MODEL_DESCRIPTIONS = fetch_nal_models_from_db()
-# ==========================================
-# 🛠️ 临时调试追踪器（看清数据库真相后可随时删除）
-# ==========================================
-st.warning("⚠️ 正在执行数据库底层数据追踪...")
-with st.expander("🔍 展开查看：Supabase 数据库真实传回的数据", expanded=True):
-    st.markdown("##### 1. 系统目前从云端抓到的所有【确切模型名称】列表：")
-    # 打印出所有的 Key，你可以直观检查有没有多余的空格或奇怪的横杠
-    st.json(list(MODEL_DESCRIPTIONS.keys()))
-    
-    st.markdown("##### 2. 云端传回的完整【名称 -> 描述】映射台账：")
-    # 打印完整的字典内容
-    st.json(MODEL_DESCRIPTIONS)
-# ==========================================
 
 # --- 🌟 5. 路由逻辑与支付墙拦截 ---
 is_saas_mode = st.query_params.get("mode") == "saas"
