@@ -425,7 +425,7 @@ with tab1:
         with st.spinner(f"正在调动【{mentor_type}】进行深度构思与 800 字试写..."):
             try:
                 # 🚀 动态提取当前选中模型的“灵魂”和“维度”
-                MODEL_DESCRIPTIONS.get(mentor_type, "默认提示")
+                mentor_desc = MODEL_DESCRIPTIONS[mentor_type]
                 focus_dimensions = "、".join(EVAL_SYSTEM_MATRIX.get(mentor_type, {}).keys())
                 
                 # 动态注入标准，彻底告别硬编码
