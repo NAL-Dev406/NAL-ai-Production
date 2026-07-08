@@ -92,11 +92,26 @@ def fetch_nal_models_from_db():
 
 @st.cache_data(ttl=30) 
 def fetch_competition_data():
+    """分页滚动拉取全量大赛数据,穿透 PostgREST 单次查询 1000 行的默认截断。
+    ⚠️ 此前未分页且按 flash_score 降序,被截断的恰好是低分作品,
+    导致总收稿量恒为 1000、争议/AI 拦截数被系统性低估。"""
     try:
-        res = supabase.table("nal_archives").select(
-            "id, work_title, genre, flash_score, is_controversial, review_status, score, final_award, committee_summary, created_at, ai_risk_score, is_ai_suspected"
-        ).eq("archive_type", "competition_2026").order("flash_score", desc=True).execute()
-        return res.data
+        all_rows = []
+        page_size = 1000
+        start = 0
+        while True:
+            res = supabase.table("nal_archives").select(
+                "id, work_title, genre, flash_score, is_controversial, review_status, score, final_award, committee_summary, created_at, ai_risk_score, is_ai_suspected"
+            ).eq("archive_type", "competition_2026")\
+            .order("flash_score", desc=True)\
+            .range(start, start + page_size - 1).execute()
+            if not res.data:
+                break
+            all_rows.extend(res.data)
+            if len(res.data) < page_size:
+                break
+            start += page_size
+        return all_rows
     except Exception as e:
         print(f"数据库读取失败: {e}") 
         return []
@@ -596,7 +611,7 @@ if is_logged_in_saas:
         comp_data = fetch_competition_data()
         
         if not comp_data:
-            st.info("📭 目前数据库中还没有大赛数据。请先在本地终端运行 python local_ensemble_runner.py ！")
+            st.info("📭 目前数据库中还没有大赛数据。请先在本地终端运行 python genre_ensemble_runner.py ！")
         else:
             df_comp = pd.DataFrame(comp_data)
             
@@ -631,7 +646,7 @@ if is_logged_in_saas:
             show_df1 = df_comp[['work_title', 'genre', 'AI_警告', 'flash_score', 'score', 'final_award', 'review_status']].rename(
                 columns={
                     'work_title': '作品名称', 
-                    'genre': '识别体裁', 
+                    'genre': '赛道体裁', 
                     'AI_警告': 'AIGC 风险',
                     'flash_score': '海选基础分', 
                     'score': '终评分',
