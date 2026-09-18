@@ -209,7 +209,7 @@ def get_adaptive_instruction(model_data, current_text, user_note=""):
     return f"""{model_data['system_instruction']}\n---\n【NAL 通用自适应校准报告】\n文本指纹：幻想({features.get('fantasy')})，现实({features.get('reality')})，人物({features.get('character')})\n{intervention_log}\n动态权重矩阵：\n{weight_desc}\n---\n请按此分配执行评审。"""
 
 MODEL_OPTIONS = [
-    "全景综合-通用基准模型", "NAL-首席专家锐评模型", "李利芳-儿童文学价值模型",
+    "全景综合-通用基准模型", "NAL-首席专家锐评模型", "谈凤霞-童年诗性与跨界叙事模型", "李利芳-儿童文学价值模型",
     "朱自强-儿童本位论模型", "视觉叙事-图文对位模型", "霍林代尔-意识形态批判模型", "后人类/生态主义先锋模型"
 ]
 
